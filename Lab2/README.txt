@@ -1,209 +1,712 @@
-# LAB 2 – INTENSITY TRANSFORMATION TECHNIQUES
+============================================================
+DIGITAL IMAGE AND VIDEO PROCESSING LAB
+LAB 2 - HISTOGRAM MATCHING AND CLAHE
+============================================================
 
-## 1. Aim
 
-To implement and study intensity transformation techniques for digital image enhancement using Python and OpenCV.
+1. AIM
+------------------------------------------------------------
 
-The following transformations are performed:
+To study and implement histogram matching (histogram
+specification) and Contrast Limited Adaptive Histogram
+Equalization (CLAHE) for digital image enhancement.
 
-1. Gamma Correction
-2. Log Transformation
-3. Image Negative
+The experiment consists of two problems:
 
-## 2. Objective
+Problem 1:
+Histogram Matching / Histogram Specification
 
-The objective of this experiment is to understand how intensity transformation techniques modify the pixel intensity values of an image and improve its visual appearance.
+Problem 2:
+Adaptive Histogram Equalization with Contrast Limiting
+(CLAHE)
 
-## 3. Software Requirements
 
-* Python 3.x
-* OpenCV
-* NumPy
-* Matplotlib
-* VS Code / PyCharm / Jupyter Notebook
-* Windows/Linux/macOS
+============================================================
+PROBLEM 1 - HISTOGRAM MATCHING
+============================================================
 
-## 4. Input Dataset
 
-Input image:
+2. PROBLEM STATEMENT
+------------------------------------------------------------
 
-`pexels.jpg`
+A film restoration studio has several frames of the same
+scene with different tonal characteristics because of
+changing daylight, film aging, and different camera rolls.
 
-The input image is stored in:
+The objective is to transform differently exposed source
+frames so that their intensity distributions match the
+distribution of a selected reference frame.
 
-`dataset/pexels.jpg`
+The experiment also considers:
 
-The same input image is used for all three intensity transformation techniques.
+1. Why histogram equalization is unsuitable.
+2. Histogram and CDF convergence.
+3. An analytically defined stylized target histogram.
+4. Failure cases of histogram matching.
 
-## 5. Libraries Used
 
-### OpenCV
+============================================================
+3. THEORY - HISTOGRAM MATCHING
+============================================================
 
-OpenCV is used for reading images, grayscale conversion, applying transformations, and saving the processed images.
+Histogram matching, also called histogram specification, is
+an image enhancement technique in which the histogram of a
+source image is transformed to match the histogram of a
+reference image.
 
-### NumPy
+If r represents the input intensity and s represents the
+output intensity, the transformation can be written as:
 
-NumPy is used for numerical operations and creation of the gamma lookup table.
+                    s = T(r)
 
-### Matplotlib
+The transformation is obtained using the cumulative
+distribution functions (CDFs) of the source and reference
+images.
 
-Matplotlib is used to display the original and transformed images.
+The source CDF is calculated from the source histogram.
 
-### OS
+The reference CDF is calculated from the reference histogram.
 
-The OS module is used to create and manage the output directory.
+For each source intensity, the reference intensity having
+the closest CDF value is selected.
 
-# 6. Theory
+This produces a lookup table which is used to transform the
+source image.
 
-Intensity transformation is a fundamental image processing technique in which the intensity values of pixels are modified according to a mathematical transformation function.
 
-The general transformation can be represented as:
+============================================================
+4. HISTOGRAM EQUALIZATION VS HISTOGRAM MATCHING
+============================================================
 
-s = T(r)
+Histogram equalization attempts to produce an approximately
+uniform intensity distribution.
 
-where:
+It does not use a particular reference image.
 
-* r = input pixel intensity
-* s = output pixel intensity
-* T = transformation function
+Therefore, it violates the main requirement of the film
+restoration application.
 
-Intensity transformations are useful for image enhancement and improving the visibility of important image details.
+The requirement is:
 
-# 7. Gamma Correction
+"All frames should have the same tonal look as a selected
+reference frame."
 
-Gamma correction is a nonlinear intensity transformation used to control the brightness of an image.
+Histogram matching satisfies this requirement because the
+reference image determines the desired intensity
+distribution.
 
-The transformation is:
+Therefore:
 
-s = 255 × (r / 255)^(1/γ)
+Histogram Equalization:
+Source -> Approximately uniform distribution
 
-where:
+Histogram Matching:
+Source -> Reference distribution
 
-* r = input pixel intensity
-* s = output pixel intensity
-* γ = gamma value
 
-In this experiment:
+============================================================
+5. HISTOGRAM MATCHING ALGORITHM
+============================================================
 
-γ = 2.2
+Step 1:
+Read the source and reference images.
 
-Gamma correction is useful for adjusting image brightness and compensating for nonlinear characteristics of display and imaging systems.
+Step 2:
+Convert the images to grayscale.
 
-## Algorithm – Gamma Correction
+Step 3:
+Calculate the histogram of the source image.
 
-1. Read the input image.
-2. Convert the image to grayscale.
-3. Set the gamma value to 2.2.
-4. Create a lookup table for all intensity values from 0 to 255.
-5. Apply the gamma transformation using the lookup table.
-6. Display the original and gamma-corrected images.
-7. Save the gamma-corrected image.
-8. Stop.
+Step 4:
+Calculate the histogram of the reference image.
 
-# 8. Log Transformation
+Step 5:
+Calculate the CDF of the source histogram.
 
-Log transformation expands the range of low-intensity pixel values and compresses high-intensity values.
+Step 6:
+Calculate the CDF of the reference histogram.
 
-The transformation is:
+Step 7:
+For every source intensity from 0 to 255, find the
+reference intensity whose CDF is closest to the source CDF.
 
-s = c × log(1 + r)
+Step 8:
+Create a lookup table using the obtained intensity mapping.
 
-where:
+Step 9:
+Apply the lookup table to every pixel of the source image.
 
-* r = input pixel intensity
-* s = output pixel intensity
-* c = scaling constant
+Step 10:
+Save and display the histogram-matched image.
 
-Log transformation is useful for enhancing details in darker regions of an image.
+Step 11:
+Compare the source, reference, and matched histograms.
 
-## Algorithm – Log Transformation
+Step 12:
+Compare the source, reference, and matched CDFs.
 
-1. Read the input image.
-2. Convert the image to grayscale.
-3. Convert the image into floating-point format.
-4. Apply the logarithmic transformation.
-5. Normalize the transformed image to the range 0–255.
-6. Convert the result to 8-bit unsigned integer format.
-7. Display the original and log-transformed images.
-8. Save the log-transformed image.
-9. Stop.
 
-# 9. Image Negative
+============================================================
+6. DATASET - PROBLEM 1
+============================================================
 
-Image negative transformation reverses the intensity values of an image.
+The following images are used:
 
-For an 8-bit grayscale image:
+reference.jpg
+source1.jpg
+source2.jpg
 
-s = 255 - r
+The source images represent differently exposed versions
+of a scene, while reference.jpg represents the desired
+tonal appearance.
 
-where:
 
-* r = input pixel intensity
-* s = output pixel intensity
+============================================================
+7. FIRST-PRINCIPLES IMPLEMENTATION
+============================================================
+
+The histogram is calculated manually.
+
+For an 8-bit grayscale image there are 256 possible
+intensity values.
+
+A histogram array of size 256 is created.
+
+For every pixel:
+
+histogram[pixel] = histogram[pixel] + 1
+
+The CDF is calculated using the cumulative sum:
+
+CDF = cumulative sum of histogram
+
+The CDF is normalized between 0 and 1.
+
+The mapping is then obtained by comparing the source CDF
+with the reference CDF.
+
+No ready-made histogram matching function is used.
+
+
+============================================================
+8. ANALYTICALLY DEFINED TARGET HISTOGRAM
+============================================================
+
+Histogram matching does not require an actual reference
+image.
+
+An analytically defined target histogram can also be used.
+
+For the stylized experiment, a Gaussian-like target
+distribution is created:
+
+                -(x-mu)^2
+p(x) = exp( --------------- )
+                   2*sigma^2
+
+The target distribution is intentionally centered toward
+lower intensity values to produce a moody, shadow-heavy
+appearance.
+
+Parameters used:
+
+Mean (mu) = 65
+
+Sigma = 25
+
+The analytical histogram is normalized and converted into
+a CDF.
+
+The source CDF is then matched to the analytical target CDF.
+
+
+============================================================
+9. HISTOGRAM MATCHING FAILURE CASE
+============================================================
+
+Histogram matching does not understand image content.
+
+It only considers the statistical distribution of pixel
+intensities.
+
+Therefore, matching a source image with a very different
+reference image can produce unnatural results.
+
+Possible problems include:
+
+1. Unnatural brightness.
+2. Excessive darkening.
+3. Loss of local details.
+4. Exaggerated shadows.
+5. Exaggerated highlights.
+6. Tonal artifacts.
+
+The important limitation is:
+
+A similar histogram does not guarantee similar visual
+content.
+
+Histogram matching is therefore most appropriate when the
+source and reference images have compatible scene content
+and the main difference is tonal appearance.
+
+
+============================================================
+PROBLEM 2 - CLAHE
+============================================================
+
+
+10. PROBLEM STATEMENT
+------------------------------------------------------------
+
+Chest X-ray images contain important fine structures in the
+lungs that may occupy a narrow intensity range.
+
+At the same time, the image may contain very bright bones
+and very dark background regions.
+
+Global histogram equalization uses one histogram for the
+entire image and may fail to enhance subtle local details.
+
+The objective is to use Adaptive Histogram Equalization
+with Contrast Limiting (CLAHE) to improve local contrast
+while reducing noise amplification.
+
+
+============================================================
+11. THEORY - GLOBAL HISTOGRAM EQUALIZATION
+============================================================
+
+Global histogram equalization uses the histogram of the
+entire image to calculate one transformation function.
+
+The same transformation is applied to every pixel.
+
+This is unsuitable when an image contains different
+regions with very different intensity characteristics.
 
 For example:
 
-Input intensity 0 becomes 255, while input intensity 255 becomes 0.
+Dark lung region
+Bright bone region
+Dark background
 
-Image negative is useful for enhancing details in certain images and is commonly used in applications such as medical image processing and photographic processing.
+All regions contribute to the same global histogram.
 
-## Algorithm – Image Negative
+A transformation suitable for one region may therefore be
+unsuitable for another region.
 
-1. Read the input image.
-2. Convert the image to grayscale.
-3. Invert the pixel intensity values.
-4. Display the original and negative images.
-5. Save the negative image.
-6. Stop.
+Consequently, subtle lung structures may remain poorly
+enhanced or become distorted.
 
-# 10. Procedure
 
-1. Place `pexels.jpg` inside the `dataset` folder.
-2. Open the Lab2 folder in VS Code.
-3. Open the `code` folder.
-4. Run `gamma_correction.py`.
-5. Observe and save the gamma-corrected image.
-6. Run `log_transformation.py`.
-7. Observe and save the log-transformed image.
-8. Run `negative.py`.
-9. Observe and save the negative image.
-10. Verify all processed images in the `output` folder.
+============================================================
+12. THEORY - CLAHE
+============================================================
 
-# 11. Output
+CLAHE stands for:
 
-The following output images are generated:
+Contrast Limited Adaptive Histogram Equalization.
 
-1. `gamma_corrected.png`
-2. `log_transformed.png`
-3. `negative.png`
+CLAHE divides an image into small rectangular regions
+called tiles.
 
-The outputs are stored in the `output` folder.
+Histogram equalization is performed independently within
+each tile.
 
-# 12. Folder Structure
+This makes the transformation dependent on local image
+statistics rather than one global histogram.
 
-Lab2/
 
-```
-README.txt
+============================================================
+13. CLAHE ALGORITHM
+============================================================
 
-code/
-    gamma_correction.py
-    log_transformation.py
-    negative.py
+Step 1:
+Read the grayscale chest X-ray image.
 
-dataset/
-    pexels.jpg
+Step 2:
+Divide the image into rectangular tiles.
 
-output/
-    gamma_corrected.png
-    log_transformed.png
-    negative.png
-```
+Step 3:
+Calculate the histogram for each tile.
 
-# 13. Result
+Step 4:
+Apply histogram equalization locally.
 
-The gamma correction, log transformation, and image negative operations were successfully implemented using Python and OpenCV.
+Step 5:
+Limit histogram bins using the clip limit.
 
-# 14. Conclusion
+Step 6:
+Redistribute the clipped histogram excess.
 
-The experiment demonstrated three important intensity transformation techniques used in digital image processing. Gamma correction was used to modify image brightness, log transformation enhanced details in darker regions, and negative transformation inverted the intensity values of the image. The processed images were successfully displayed and saved for further analysis.
+Step 7:
+Calculate the local transformation.
+
+Step 8:
+Use interpolation between neighboring tiles to produce
+smooth transitions.
+
+Step 9:
+Combine the locally enhanced regions.
+
+Step 10:
+Generate the final CLAHE image.
+
+
+============================================================
+14. CONTRAST LIMITING
+============================================================
+
+A major problem with adaptive histogram equalization is
+noise amplification.
+
+In a homogeneous region, a small amount of noise may
+occupy a narrow histogram bin.
+
+Without contrast limiting, this bin can be strongly
+amplified.
+
+CLAHE limits the height of histogram bins using a clip
+limit.
+
+If a histogram bin exceeds the clip limit:
+
+1. The excess pixels are removed from the bin.
+2. The excess is redistributed among other bins.
+3. The local transformation becomes less aggressive.
+
+Therefore, contrast limiting reduces excessive noise
+amplification in homogeneous regions.
+
+
+============================================================
+15. BILINEAR INTERPOLATION
+============================================================
+
+Independent processing of tiles can produce visible
+boundaries or block-like seams.
+
+CLAHE reduces this problem by interpolating the mappings
+from neighboring tiles.
+
+Bilinear interpolation combines the transformations of
+neighboring tiles according to the pixel's position.
+
+Therefore, the transition between adjacent tiles becomes
+smooth.
+
+This reduces blocky artifacts and visible seams.
+
+
+============================================================
+16. CLIP LIMIT PARAMETER
+============================================================
+
+The clip limit controls how strongly local contrast is
+enhanced.
+
+Low clip limit:
+
+- Less contrast enhancement.
+- Less noise amplification.
+- May fail to reveal weak details.
+
+Moderate clip limit:
+
+- Good local contrast.
+- Better detail visibility.
+- Controlled noise.
+
+Very high clip limit:
+
+- Strong contrast enhancement.
+- Increased noise amplification.
+- Possible artifacts.
+
+
+============================================================
+17. TILE SIZE PARAMETER
+============================================================
+
+Tile size controls the spatial scale of local enhancement.
+
+Very large tiles:
+
+- Behavior approaches global histogram equalization.
+- Less local adaptation.
+- Fine local details may not be enhanced sufficiently.
+
+Very small tiles:
+
+- Strong local adaptation.
+- Higher sensitivity to noise.
+- Possible artificial texture.
+- Higher computational cost.
+
+Moderate tile size:
+
+- Good balance between local enhancement and stability.
+
+
+============================================================
+18. PARAMETER SWEEP
+============================================================
+
+The experiment evaluates the following clip limits:
+
+0.5
+1.0
+2.0
+4.0
+8.0
+
+The following tile sizes are evaluated:
+
+2 x 2
+4 x 4
+8 x 8
+16 x 16
+32 x 32
+
+For every parameter combination, the following metrics
+are calculated:
+
+1. Entropy
+2. Local contrast
+
+
+============================================================
+19. ENTROPY
+============================================================
+
+Entropy measures the amount of information or randomness
+in an image.
+
+It is calculated as:
+
+H = -SUM(p(i) * log2(p(i)))
+
+where p(i) is the probability of intensity i.
+
+Higher entropy generally indicates a richer intensity
+distribution.
+
+However, maximum entropy does not always mean maximum
+visual quality because excessive noise can also increase
+entropy.
+
+
+============================================================
+20. LOCAL CONTRAST
+============================================================
+
+Local contrast measures the variation of intensity within
+local neighborhoods.
+
+In this experiment, local standard deviation is used as a
+measure of local contrast.
+
+Higher local contrast indicates stronger local intensity
+variation.
+
+This metric helps determine whether CLAHE reveals more
+local detail than global equalization.
+
+
+============================================================
+21. DATASET - PROBLEM 2
+============================================================
+
+Input image:
+
+chest_xray.jpg
+
+The image is a grayscale chest X-ray used for studying
+local contrast enhancement.
+
+
+============================================================
+22. OUTPUTS
+============================================================
+
+Problem 1 outputs:
+
+source1_matched.png
+source2_matched.png
+histogram_matching_results.png
+histogram_comparison.png
+cdf_comparison.png
+stylized_moody.png
+stylized_histogram_result.png
+stylized_cdf.png
+failure_case_matched.png
+failure_case_comparison.png
+failure_case_histograms.png
+
+
+Problem 2 outputs:
+
+global_equalization.png
+clahe_result.png
+original_global_clahe.png
+histogram_comparison.png
+
+clip_0.5.png
+clip_1.0.png
+clip_2.0.png
+clip_4.0.png
+clip_8.0.png
+
+clip_limit_entropy.png
+clip_limit_contrast.png
+
+tile_2x2.png
+tile_4x4.png
+tile_8x8.png
+tile_16x16.png
+tile_32x32.png
+
+tile_size_entropy.png
+tile_size_contrast.png
+
+
+============================================================
+23. SOFTWARE REQUIREMENTS
+============================================================
+
+Python 3.x
+
+Libraries:
+
+1. OpenCV
+2. NumPy
+3. Matplotlib
+
+Install required libraries using:
+
+pip install opencv-python numpy matplotlib
+
+
+============================================================
+24. FOLDER STRUCTURE
+============================================================
+
+Lab3/
+
+    README.txt
+
+    code/
+
+        histogram_matching.py
+        stylized_histogram.py
+        histogram_matching_failure.py
+        clahe_analysis.py
+
+    dataset/
+
+        reference.jpg
+        source1.jpg
+        source2.jpg
+        chest_xray.png
+
+    output/
+
+        problem1/
+
+            source1_matched.png
+            source2_matched.png
+            histogram_matching_results.png
+            histogram_comparison.png
+            cdf_comparison.png
+            stylized_moody.png
+            stylized_histogram_result.png
+            stylized_cdf.png
+            failure_case_matched.png
+            failure_case_comparison.png
+            failure_case_histograms.png
+
+        problem2/
+
+            global_equalization.png
+            clahe_result.png
+            original_global_clahe.png
+            histogram_comparison.png
+            clip_0.5.png
+            clip_1.0.png
+            clip_2.0.png
+            clip_4.0.png
+            clip_8.0.png
+            clip_limit_entropy.png
+            clip_limit_contrast.png
+            tile_2x2.png
+            tile_4x4.png
+            tile_8x8.png
+            tile_16x16.png
+            tile_32x32.png
+            tile_size_entropy.png
+            tile_size_contrast.png
+
+
+============================================================
+25. RESULT
+============================================================
+
+Histogram matching successfully transformed differently
+exposed source images toward the tonal distribution of the
+selected reference image.
+
+The CDF-based transformation successfully demonstrated
+histogram specification from first principles.
+
+An analytically defined target histogram was also used to
+create a stylized shadow-heavy appearance.
+
+The failure experiment demonstrated that histogram matching
+can produce unnatural results when the source and reference
+images have substantially different visual content.
+
+CLAHE successfully provided local contrast enhancement for
+the chest X-ray image.
+
+The parameter sweep demonstrated the effects of clip limit
+and tile size on entropy and local contrast.
+
+
+============================================================
+26. CONCLUSION
+============================================================
+
+Histogram matching and CLAHE are useful image enhancement
+techniques but solve different problems.
+
+Histogram matching is appropriate when the desired tonal
+distribution is known and a reference image or target
+distribution is available.
+
+Unlike global histogram equalization, histogram matching
+preserves the desired reference distribution instead of
+forcing every image toward a uniform histogram.
+
+CLAHE is appropriate when local contrast enhancement is
+required. It analyzes individual image tiles and enhances
+local structures.
+
+The contrast limiting mechanism prevents excessive
+amplification of noise, while interpolation between
+neighboring tiles reduces block boundaries.
+
+The experiments also demonstrate that parameter selection
+is important. Excessive clip limits can amplify noise,
+while very small tiles can create unstable local
+enhancement. Very large tiles reduce the local adaptive
+behavior.
+
+Therefore, both histogram matching and CLAHE should be
+selected according to the image characteristics and the
+desired enhancement objective.
+
+
+============================================================
+
+============================================================

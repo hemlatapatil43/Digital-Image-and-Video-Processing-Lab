@@ -1,20 +1,27 @@
-# LAB 1 – BASIC IMAGE PROCESSING OPERATIONS USING OPENCV
+# LAB 1 – INTENSITY TRANSFORMATION TECHNIQUES
 
 ## 1. Aim
 
-To perform basic image processing operations such as image resizing, grayscale conversion, image rotation, Gaussian blurring, and edge detection using Python and OpenCV.
+To implement and study intensity transformation techniques for digital image enhancement using Python and OpenCV.
+
+The following transformations are performed:
+
+1. Gamma Correction
+2. Log Transformation
+3. Image Negative
 
 ## 2. Objective
 
-The objective of this experiment is to understand and implement fundamental image processing operations on a digital image using Python libraries such as OpenCV and Matplotlib.
+The objective of this experiment is to understand how intensity transformation techniques modify the pixel intensity values of an image and improve its visual appearance.
 
 ## 3. Software Requirements
 
 * Python 3.x
 * OpenCV
+* NumPy
 * Matplotlib
-* Operating System: Windows/Linux/macOS
 * VS Code / PyCharm / Jupyter Notebook
+* Windows/Linux/macOS
 
 ## 4. Input Dataset
 
@@ -26,132 +33,177 @@ The input image is stored in:
 
 `dataset/pexels.jpg`
 
+The same input image is used for all three intensity transformation techniques.
+
 ## 5. Libraries Used
 
 ### OpenCV
 
-OpenCV is used for image reading, color conversion, resizing, rotation, Gaussian filtering, and Canny edge detection.
+OpenCV is used for reading images, grayscale conversion, applying transformations, and saving the processed images.
+
+### NumPy
+
+NumPy is used for numerical operations and creation of the gamma lookup table.
 
 ### Matplotlib
 
-Matplotlib is used to display the processed images.
+Matplotlib is used to display the original and transformed images.
 
 ### OS
 
 The OS module is used to create and manage the output directory.
 
-## 6. Image Processing Operations
+# 6. Theory
 
-### 6.1 Image Resizing
+Intensity transformation is a fundamental image processing technique in which the intensity values of pixels are modified according to a mathematical transformation function.
 
-Image resizing changes the width and height of an image according to the dimensions provided by the user.
+The general transformation can be represented as:
 
-The OpenCV function used is:
+s = T(r)
 
-`cv2.resize()`
+where:
 
-### 6.2 Grayscale Conversion
+* r = input pixel intensity
+* s = output pixel intensity
+* T = transformation function
 
-A color image contains three channels: Red, Green, and Blue. Grayscale conversion converts the image into a single intensity channel.
+Intensity transformations are useful for image enhancement and improving the visibility of important image details.
 
-The OpenCV function used is:
+# 7. Gamma Correction
 
-`cv2.cvtColor()`
+Gamma correction is a nonlinear intensity transformation used to control the brightness of an image.
 
-with:
+The transformation is:
 
-`cv2.COLOR_BGR2GRAY`
+s = 255 × (r / 255)^(1/γ)
 
-### 6.3 Image Rotation
+where:
 
-Rotation changes the orientation of an image. In this experiment, the image is rotated by 90 degrees clockwise.
+* r = input pixel intensity
+* s = output pixel intensity
+* γ = gamma value
 
-The OpenCV function used is:
+In this experiment:
 
-`cv2.rotate()`
+γ = 2.2
 
-### 6.4 Gaussian Blurring
+Gamma correction is useful for adjusting image brightness and compensating for nonlinear characteristics of display and imaging systems.
 
-Gaussian blur is used to smooth an image and reduce small details and noise.
+## Algorithm – Gamma Correction
 
-The OpenCV function used is:
+1. Read the input image.
+2. Convert the image to grayscale.
+3. Set the gamma value to 2.2.
+4. Create a lookup table for all intensity values from 0 to 255.
+5. Apply the gamma transformation using the lookup table.
+6. Display the original and gamma-corrected images.
+7. Save the gamma-corrected image.
+8. Stop.
 
-`cv2.GaussianBlur()`
+# 8. Log Transformation
 
-A `(15, 15)` Gaussian kernel is used.
+Log transformation expands the range of low-intensity pixel values and compresses high-intensity values.
 
-### 6.5 Edge Detection
+The transformation is:
 
-Edge detection identifies significant changes in intensity in an image. Canny edge detection is used in this experiment.
+s = c × log(1 + r)
 
-The OpenCV function used is:
+where:
 
-`cv2.Canny()`
+* r = input pixel intensity
+* s = output pixel intensity
+* c = scaling constant
 
-The threshold values used are:
+Log transformation is useful for enhancing details in darker regions of an image.
 
-* Lower threshold = 100
-* Upper threshold = 200
+## Algorithm – Log Transformation
 
-## 7. Algorithm
+1. Read the input image.
+2. Convert the image to grayscale.
+3. Convert the image into floating-point format.
+4. Apply the logarithmic transformation.
+5. Normalize the transformed image to the range 0–255.
+6. Convert the result to 8-bit unsigned integer format.
+7. Display the original and log-transformed images.
+8. Save the log-transformed image.
+9. Stop.
 
-1. Start the program.
-2. Read the input image from the dataset folder.
-3. Check whether the image was loaded successfully.
-4. Convert the image from BGR to RGB for displaying using Matplotlib.
-5. Display the image processing menu.
-6. Select an operation from the menu.
-7. Perform the selected operation.
-8. Display the processed image.
-9. Save the processed image in the output folder.
-10. Repeat the process until the user selects Exit.
-11. Stop the program.
+# 9. Image Negative
 
-## 8. Procedure
+Image negative transformation reverses the intensity values of an image.
 
-1. Place the input image `pexels.jpg` inside the `dataset` folder.
-2. Open the `Lab1` folder in VS Code or another Python IDE.
+For an 8-bit grayscale image:
+
+s = 255 - r
+
+where:
+
+* r = input pixel intensity
+* s = output pixel intensity
+
+For example:
+
+Input intensity 0 becomes 255, while input intensity 255 becomes 0.
+
+Image negative is useful for enhancing details in certain images and is commonly used in applications such as medical image processing and photographic processing.
+
+## Algorithm – Image Negative
+
+1. Read the input image.
+2. Convert the image to grayscale.
+3. Invert the pixel intensity values.
+4. Display the original and negative images.
+5. Save the negative image.
+6. Stop.
+
+# 10. Procedure
+
+1. Place `pexels.jpg` inside the `dataset` folder.
+2. Open the Lab2 folder in VS Code.
 3. Open the `code` folder.
-4. Run `lab1.py`.
-5. Select an operation from the menu.
-6. For resizing, enter the required width and height.
-7. View the processed image.
-8. The processed image is automatically saved in the `output` folder.
-9. Repeat for all available operations.
+4. Run `gamma_correction.py`.
+5. Observe and save the gamma-corrected image.
+6. Run `log_transformation.py`.
+7. Observe and save the log-transformed image.
+8. Run `negative.py`.
+9. Observe and save the negative image.
+10. Verify all processed images in the `output` folder.
 
-## 9. Output
+# 11. Output
 
-The program generates the following output images:
+The following output images are generated:
 
-1. Resized Image
-2. Grayscale Image
-3. Rotated Image
-4. Gaussian Blurred Image
-5. Canny Edge Detected Image
+1. `gamma_corrected.png`
+2. `log_transformed.png`
+3. `negative.png`
 
-All output images are stored in the `output` folder.
+The outputs are stored in the `output` folder.
 
-## 10. Folder Structure
+# 12. Folder Structure
 
-Lab1/
+Lab2/
 
 ```
+README.txt
+
 code/
-    lab1.py
+    gamma_correction.py
+    log_transformation.py
+    negative.py
 
 dataset/
     pexels.jpg
 
 output/
-    resized_image.png
-    grayscale_image.png
-    rotated_image.png
-    blurred_image.png
-    edge_detection.png
-
-README.txt
+    gamma_corrected.png
+    log_transformed.png
+    negative.png
 ```
 
-## 11. Conclusion
+# 13. Result
 
-The basic image processing operations were successfully implemented using Python and OpenCV. The experiment helped in understanding how an image can be resized, converted to grayscale, rotated, blurred, and processed for edge detection. The processed results were displayed and saved for further analysis.
+The gamma correction, log transformation, and image negative operations were successfully implemented using Python and OpenCV.
+
+# 14. Conclusion
+
+The experiment demonstrated three important intensity transformation techniques used in digital image processing. Gamma correction was used to modify image brightness, log transformation enhanced details in darker regions, and negative transformation inverted the intensity values of the image. The processed images were successfully displayed and saved for further analysis.
